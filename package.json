@@ -2,7 +2,7 @@
     "name": "searchtree",
     "version": "1.0.0",
     "author": "Michael Hanus <mh@informatik.uni-kiel.de>",
-    "synopsis": "Library with to represent strongly encapsulated non-deterministic computations as a search tree",
+    "synopsis": "Library to represent strongly encapsulated non-deterministic computations as a search tree",
     "category": [ "Programming" ],
     "dependencies": { },
     "exportedModules": [ "UnsafeSearchTree" ],
