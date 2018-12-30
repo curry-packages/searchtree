@@ -4,14 +4,14 @@
     "author": "Michael Hanus <mh@informatik.uni-kiel.de>",
     "synopsis": "Library to represent strongly encapsulated non-deterministic computations as a search tree",
     "category": [ "Programming" ],
-    "dependencies": { },
-    "exportedModules": [ "UnsafeSearchTree" ],
-    "compilerCompatibility": {
-        "kics2": ">= 2.0.0"
+    "dependencies": {
+        "base"    : ">= 1.0.0, < 2.0.0",
+        "random"  : ">= 0.0.1"
     },
-    "testsuite": {
-        "src-dir": "test",
-        "modules": [ "TestExpTypeInference", "TestUnsafeSearchTree" ]
+    "exportedModules": [ "Control.SearchTree", "Control.SearchTree.Generators", "Control.SearchTree.Traversal" ],
+    "compilerCompatibility": {
+        "pakcs": ">= 2.0.0",
+        "kics2": ">= 2.0.0"
     },
     "license": "BSD-3-Clause",
     "licenseFile": "LICENSE",
