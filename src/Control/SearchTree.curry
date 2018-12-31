@@ -22,10 +22,10 @@ module Control.SearchTree
   ) where
 
 #ifdef __PAKCS__
-import Findall       (allValues)
+import Control.Findall ( allValues )
 #endif
-import IO            (hFlush,stdout)
-import List          (diagonal)
+import IO              ( hFlush, stdout )
+import List            ( diagonal )
 import ValueSequence
 
 --- A search tree is a value, a failure, or a choice between two search trees.

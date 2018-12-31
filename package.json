@@ -2,13 +2,14 @@
     "name": "searchtree",
     "version": "1.0.0",
     "author": "Michael Hanus <mh@informatik.uni-kiel.de>",
-    "synopsis": "Library to represent strongly encapsulated non-deterministic computations as a search tree",
+    "synopsis": "Libraries with operations to strongly encapsulated non-deterministic computations as a search tree or list",
     "category": [ "Programming" ],
     "dependencies": {
         "base"    : ">= 1.0.0, < 2.0.0",
         "random"  : ">= 0.0.1"
     },
-    "exportedModules": [ "Control.SearchTree", "Control.SearchTree.Generators", "Control.SearchTree.Traversal" ],
+    "exportedModules": [ "Control.SearchTree", "Control.SearchTree.Generators",
+                         "Control.SearchTree.Traversal", "Control.Findall" ],
     "compilerCompatibility": {
         "pakcs": ">= 2.0.0",
         "kics2": ">= 2.0.0"
