@@ -10,7 +10,8 @@
     },
     "exportedModules": [ "Control.SearchTree", "Control.SearchTree.Generators",
                          "Control.SearchTree.Traversal",
-                         "Control.AllSolutions", "Control.Findall" ],
+                         "Control.AllSolutions", "Control.Findall",
+                         "Control.ValueSequence" ],
     "compilerCompatibility": {
         "pakcs": ">= 2.0.0",
         "kics2": ">= 2.0.0"

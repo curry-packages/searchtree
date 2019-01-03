@@ -21,12 +21,13 @@ module Control.SearchTree
   , someValue, someValueWith
   ) where
 
+import IO              ( hFlush, stdout )
+import List            ( diagonal )
+
 #ifdef __PAKCS__
 import Control.Findall ( allValues )
 #endif
-import IO              ( hFlush, stdout )
-import List            ( diagonal )
-import ValueSequence
+import Control.ValueSequence
 
 --- A search tree is a value, a failure, or a choice between two search trees.
 data SearchTree a = Value a
