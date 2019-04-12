@@ -21,8 +21,8 @@ module Control.SearchTree
   , someValue, someValueWith
   ) where
 
-import IO              ( hFlush, stdout )
-import List            ( diagonal )
+import System.IO       ( hFlush, stdout )
+import Data.List       ( diagonal )
 
 #ifdef __PAKCS__
 import Control.Findall ( allValues )
@@ -239,7 +239,7 @@ allValuesWith strategy searchtree = vsToList (strategy searchtree)
 
 --- Return all values in a search tree via depth-first search.
 allValuesDFS :: SearchTree a -> [a]
-allValuesDFS = allValuesWith dfsStrategy 
+allValuesDFS = allValuesWith dfsStrategy
 
 --- Return all values in a search tree via breadth-first search.
 allValuesBFS :: SearchTree a -> [a]
@@ -280,7 +280,7 @@ getAllValuesWith strategy exp = do
 --- i.e., the evaluation of the expression does not share any results.
 printAllValuesWith :: Show a => Strategy a -> a -> IO ()
 printAllValuesWith strategy exp =
-  getAllValuesWith strategy exp >>= mapIO_ print
+  getAllValuesWith strategy exp >>= mapM_ print
 
 
 --- Prints the values of an expression w.r.t. a search strategy
@@ -294,7 +294,7 @@ printValuesWith :: Show a => Strategy a -> a -> IO ()
 printValuesWith strategy exp =
   getAllValuesWith strategy exp >>= printValues
  where
-  printValues [] = done
+  printValues [] = return ()
   printValues (x:xs) = do
    putStr (show x)
    hFlush stdout

@@ -82,7 +82,7 @@ getOneSolution c = do
 getAllFailures :: a -> (a -> Bool) -> IO [a]
 getAllFailures generator test = do
   xs <- getAllValues generator
-  failures <- mapIO (naf test) xs
+  failures <- mapM (naf test) xs
   return $ concat failures
 
 -- (naf c x) returns [x] if (c x) fails, and [] otherwise.

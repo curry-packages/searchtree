@@ -1,8 +1,6 @@
 -- Some examples for the use of the module AllSolutions
 
 import Control.AllSolutions
-import Combinatorial
-import Integer
 
 -- The famous non-deterministic function:
 coin :: Int
@@ -54,3 +52,15 @@ queens n = getAllFailures (permute [1..n]) capture
 
 capture y = let l1,l2,l3,y1,y2 free in
   l1 ++ [y1] ++ l2 ++ [y2] ++ l3 =:= y & abs (y1-y2) =:= length l2 + 1
+
+
+--- Compute any permutation of a list.
+---
+--- @param xs - The list.
+--- @return A permutation of the argument.
+
+permute        :: [a] -> [a]
+permute []     = []
+permute (x:xs) = ndinsert (permute xs)
+    where ndinsert [] = [x]
+          ndinsert (y:ys) = (x:y:ys) ? (y:ndinsert ys)

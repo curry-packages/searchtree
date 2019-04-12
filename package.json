@@ -1,20 +1,20 @@
 {
     "name": "searchtree",
-    "version": "1.0.0",
+    "version": "3.0.0",
     "author": "Michael Hanus <mh@informatik.uni-kiel.de>",
     "synopsis": "Libraries with operations to strongly encapsulated non-deterministic computations as a search tree or list",
     "category": [ "Logic", "Programming" ],
     "dependencies": {
-        "base"    : ">= 1.0.0, < 2.0.0",
-        "random"  : ">= 0.0.1"
+        "base"         : ">= 3.0.0, < 4.0.0",
+        "random"       : ">= 3.0.0, < 4.0.0"
     },
     "exportedModules": [ "Control.SearchTree", "Control.SearchTree.Generators",
                          "Control.SearchTree.Traversal",
                          "Control.AllSolutions", "Control.Findall",
                          "Control.ValueSequence" ],
     "compilerCompatibility": {
-        "pakcs": ">= 2.0.0",
-        "kics2": ">= 2.0.0"
+        "pakcs": ">= 3.0.0, < 4.0.0",
+        "kics2": ">= 3.0.0, < 4.0.0"
     },
     "license": "BSD-3-Clause",
     "licenseFile": "LICENSE",

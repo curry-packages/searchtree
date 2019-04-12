@@ -242,7 +242,7 @@ browse g = putStr (show (unpack g))
 --- Unpacks solutions from a list of lambda abstractions and write
 --- them to the screen.
 browseList :: Show a => [a -> Bool] -> IO ()
-browseList []     = done
+browseList []     = return ()
 browseList (g:gs) = browse g >> putChar '\n' >> browseList gs
 
 
