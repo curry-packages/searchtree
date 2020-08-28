@@ -60,7 +60,7 @@ getOneValue x = do
 --- of the constraint does not share any results. Moreover, this
 --- evaluation suspends if the constraints contain unbound variables.
 --- Similar to Prolog's findall.
-getAllSolutions :: (a->Bool) -> IO [a]
+getAllSolutions :: (a -> Bool) -> IO [a]
 #ifdef __PAKCS__
 getAllSolutions c = return (findall c)
 #else
@@ -70,7 +70,7 @@ getAllSolutions c = getAllValues (let x free in (x,c x)) >>= return . map fst
 --- Gets one solution to a constraint (currently, via an incomplete
 --- left-to-right strategy). Returns Nothing if the search space
 --- is finitely failed.
-getOneSolution :: (a->Bool) -> IO (Maybe a)
+getOneSolution :: (a -> Bool) -> IO (Maybe a)
 getOneSolution c = do
   sols <- getAllSolutions c
   return (if null sols then Nothing else Just (head sols))
