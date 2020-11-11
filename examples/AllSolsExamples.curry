@@ -19,6 +19,7 @@ all2 = let cc = coin+coin in
 first1 = getOneValue (coin+coin) >>= print
 
 -- Generate search tree of depth 0 (similar to getAllSolutions):
+tree0 :: IO (SearchTree Int Int)
 tree0 = getSearchTree [] (=:=(x+y))
         where
           x=coin

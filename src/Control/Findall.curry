@@ -203,7 +203,7 @@ once g = head (solveAll g)
 --- a specified operator that can always take a decision which
 --- of two solutions is better.
 --- In general, the comparison operation should be rigid in its arguments!
-best           :: (a -> Bool) -> (a -> a -> Bool) -> [a -> Bool]
+best :: Data a => (a -> Bool) -> (a -> a -> Bool) -> [a -> Bool]
 best g cmp = bestHelp [] (try g) []
  where
    bestHelp [] []     curbest = curbest
@@ -236,18 +236,18 @@ findfirst :: (a -> Bool) -> a
 findfirst external
 
 --- Shows the solution of a solved constraint.
-browse  :: Show a => (a -> Bool) -> IO ()
+browse  :: (Data a, Show a) => (a -> Bool) -> IO ()
 browse g = putStr (show (unpack g))
 
 --- Unpacks solutions from a list of lambda abstractions and write
 --- them to the screen.
-browseList :: Show a => [a -> Bool] -> IO ()
+browseList :: (Data a, Show a) => [a -> Bool] -> IO ()
 browseList []     = return ()
 browseList (g:gs) = browse g >> putChar '\n' >> browseList gs
 
 
 --- Unpacks a solution's value from a (solved) search goal.
-unpack  :: (a -> Bool) -> a
+unpack  :: Data a => (a -> Bool) -> a
 unpack g | g x = x where x free
 
 --- Gets all values computable by term rewriting.

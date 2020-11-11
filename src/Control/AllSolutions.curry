@@ -60,7 +60,7 @@ getOneValue x = do
 --- of the constraint does not share any results. Moreover, this
 --- evaluation suspends if the constraints contain unbound variables.
 --- Similar to Prolog's findall.
-getAllSolutions :: (a->Bool) -> IO [a]
+getAllSolutions :: (a -> Bool) -> IO [a]
 #ifdef __PAKCS__
 getAllSolutions c = return (findall c)
 #else
@@ -70,7 +70,7 @@ getAllSolutions c = getAllValues (let x free in (x,c x)) >>= return . map fst
 --- Gets one solution to a constraint (currently, via an incomplete
 --- left-to-right strategy). Returns Nothing if the search space
 --- is finitely failed.
-getOneSolution :: (a->Bool) -> IO (Maybe a)
+getOneSolution :: (a -> Bool) -> IO (Maybe a)
 getOneSolution c = do
   sols <- getAllSolutions c
   return (if null sols then Nothing else Just (head sols))
@@ -113,14 +113,14 @@ data SearchTree a b = SearchBranch [(b,SearchTree a b)] | Solutions [a]
 --- the search tree contains a branch node with a child tree
 --- for each value of this element. Moreover, evaluations of
 --- elements in the branch list are shared within corresponding subtrees.
-getSearchTree :: [a] -> (b -> Bool) -> IO (SearchTree b a)
+getSearchTree :: Data a => [a] -> (b -> Bool) -> IO (SearchTree b a)
 getSearchTree cs goal = return (getSearchTreeUnsafe cs goal)
 
-getSearchTreeUnsafe :: [a] -> (b -> Bool) -> (SearchTree b a)
+getSearchTreeUnsafe :: Data a => [a] -> (b -> Bool) -> (SearchTree b a)
 getSearchTreeUnsafe [] goal = Solutions (findall goal)
 getSearchTreeUnsafe (c:cs) goal  =
-                                 SearchBranch (findall (=:=(solve c cs goal)))
+  SearchBranch (findall (=:= (solve c cs goal)))
 
-solve :: a -> [a] -> (b -> Bool) -> (a,SearchTree b a)
+solve :: Data a => a -> [a] -> (b -> Bool) -> (a,SearchTree b a)
 solve c cs goal | c=:=y = (y, getSearchTreeUnsafe cs goal) where y free
 #endif
