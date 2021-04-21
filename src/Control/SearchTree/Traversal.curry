@@ -10,7 +10,7 @@ module Control.SearchTree.Traversal
     depthDiag, rndDepthDiag, levelDiag, rndLevelDiag, rndLevelDiagFlat
   ) where
 
-import List          ( diagonal )
+import Data.List     ( diagonal )
 import System.Random ( nextInt, nextIntRange, shuffle )
 
 import Control.SearchTree

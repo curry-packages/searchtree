@@ -25,7 +25,7 @@ module Control.AllSolutions
 
 #ifdef __PAKCS__
 import Control.Findall
-#else
+#elif defined(__KICS2__)
 import Control.SearchTree
 #endif
 
@@ -34,20 +34,24 @@ import Control.SearchTree
 --- on a copy of the expression, i.e., the evaluation of the expression
 --- does not share any results. Moreover, the evaluation suspends
 --- as long as the expression contains unbound variables.
-getAllValues :: a -> IO [a]
+getAllValues :: Data a => a -> IO [a]
 #ifdef __PAKCS__
 getAllValues e = return (findall (=:=e))
-#else
+#elif defined(__CURRY2GO__)
+getAllValues external
+#elif defined(__KICS2__)
 getAllValues e = getSearchTree e >>= return . allValuesDFS
 #endif
 
 --- Gets one value of an expression (currently, via an incomplete
 --- left-to-right strategy). Returns Nothing if the search space
 --- is finitely failed.
-getOneValue :: a -> IO (Maybe a)
+getOneValue :: Data a => a -> IO (Maybe a)
 #ifdef __PAKCS__
 getOneValue x = getOneSolution (x=:=)
-#else
+#elif defined(__CURRY2GO__)
+getOneValue external
+#elif defined(__KICS2__)
 getOneValue x = do
   st <- getSearchTree x
   let vals = allValuesDFS st
@@ -60,7 +64,7 @@ getOneValue x = do
 --- of the constraint does not share any results. Moreover, this
 --- evaluation suspends if the constraints contain unbound variables.
 --- Similar to Prolog's findall.
-getAllSolutions :: (a -> Bool) -> IO [a]
+getAllSolutions :: Data a => (a -> Bool) -> IO [a]
 #ifdef __PAKCS__
 getAllSolutions c = return (findall c)
 #else
@@ -70,36 +74,38 @@ getAllSolutions c = getAllValues (let x free in (x,c x)) >>= return . map fst
 --- Gets one solution to a constraint (currently, via an incomplete
 --- left-to-right strategy). Returns Nothing if the search space
 --- is finitely failed.
-getOneSolution :: (a -> Bool) -> IO (Maybe a)
+getOneSolution :: Data a => (a -> Bool) -> IO (Maybe a)
+#ifdef __PAKCS__
+getOneSolution c = prim_getOneSolution c
+
+prim_getOneSolution :: (a -> Bool) -> IO (Maybe a)
+prim_getOneSolution external
+
+#else
 getOneSolution c = do
   sols <- getAllSolutions c
   return (if null sols then Nothing else Just (head sols))
+#endif
 
 --- Returns a list of values that do not satisfy a given constraint.
 --- @param x - an expression (a generator evaluable to various values)
 --- @param c - a constraint that should not be satisfied
 --- @return A list of all values of e such that (c e) is not provable
-getAllFailures :: a -> (a -> Bool) -> IO [a]
+getAllFailures :: Data a => a -> (a -> Bool) -> IO [a]
 getAllFailures generator test = do
   xs <- getAllValues generator
-  failures <- mapIO (naf test) xs
+  failures <- mapM (naf test) xs
   return $ concat failures
 
 -- (naf c x) returns [x] if (c x) fails, and [] otherwise.
-naf :: (a -> Bool) -> a -> IO [a]
-#ifdef __PAKCS__
-naf c x = do
-  mbl <- getOneSolution (\_->c x)
-  return (maybe [x] (const []) mbl)
-#else
+naf :: Data a => (a -> Bool) -> a -> IO [a]
 naf c x = getOneSolution (lambda c x) >>= returner x
-
-lambda :: (a -> Bool) -> a -> () -> Bool
-lambda c x _ = c x
-
-returner :: a -> Maybe b -> IO [a]
-returner x mbl = return (maybe [x] (const []) mbl)
-#endif
+ where
+  lambda :: (a -> Bool) -> a -> () -> Bool
+  lambda p y _ = p y
+  
+  returner :: a -> Maybe b -> IO [a]
+  returner y mbl = return (maybe [y] (const []) mbl)
 
 
 #ifdef __PAKCS__
@@ -113,14 +119,15 @@ data SearchTree a b = SearchBranch [(b,SearchTree a b)] | Solutions [a]
 --- the search tree contains a branch node with a child tree
 --- for each value of this element. Moreover, evaluations of
 --- elements in the branch list are shared within corresponding subtrees.
-getSearchTree :: [a] -> (b -> Bool) -> IO (SearchTree b a)
+getSearchTree :: (Data a, Data b) => [a] -> (b -> Bool) -> IO (SearchTree b a)
 getSearchTree cs goal = return (getSearchTreeUnsafe cs goal)
 
-getSearchTreeUnsafe :: [a] -> (b -> Bool) -> (SearchTree b a)
+getSearchTreeUnsafe :: (Data a, Data b) =>
+                       [a] -> (b -> Bool) -> (SearchTree b a)
 getSearchTreeUnsafe [] goal = Solutions (findall goal)
 getSearchTreeUnsafe (c:cs) goal  =
-                                 SearchBranch (findall (=:=(solve c cs goal)))
+  SearchBranch (findall (=:= (solve c cs goal)))
 
-solve :: a -> [a] -> (b -> Bool) -> (a,SearchTree b a)
+solve :: (Data a, Data b) => a -> [a] -> (b -> Bool) -> (a, SearchTree b a)
 solve c cs goal | c=:=y = (y, getSearchTreeUnsafe cs goal) where y free
 #endif
