@@ -25,7 +25,7 @@ module Control.AllSolutions
 
 #ifdef __PAKCS__
 import Control.Findall
-#else
+#elif defined(__KICS2__)
 import Control.SearchTree
 #endif
 
@@ -37,7 +37,9 @@ import Control.SearchTree
 getAllValues :: Data a => a -> IO [a]
 #ifdef __PAKCS__
 getAllValues e = return (findall (=:=e))
-#else
+#elif defined(__CURRY2GO__)
+getAllValues external
+#elif defined(__KICS2__)
 getAllValues e = getSearchTree e >>= return . allValuesDFS
 #endif
 
@@ -47,7 +49,9 @@ getAllValues e = getSearchTree e >>= return . allValuesDFS
 getOneValue :: Data a => a -> IO (Maybe a)
 #ifdef __PAKCS__
 getOneValue x = getOneSolution (x=:=)
-#else
+#elif defined(__CURRY2GO__)
+getOneValue external
+#elif defined(__KICS2__)
 getOneValue x = do
   st <- getSearchTree x
   let vals = allValuesDFS st
