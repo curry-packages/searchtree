@@ -28,8 +28,7 @@ module Control.Findall
 #endif
   ) where
 
-#ifdef __PAKCS__
-#else
+#ifdef __KICS2__
 import qualified Control.SearchTree as ST
 #endif
 
@@ -60,10 +59,10 @@ getSomeValue e = return (someValue e)
 --- Note that this operation is not purely declarative since the ordering
 --- of the computed values depends on the ordering of the program rules.
 allValues :: a -> [a]
-#ifdef __PAKCS__
-allValues external
-#else
+#ifdef __KICS2__
 allValues e = ST.allValuesDFS (ST.someSearchTree e)
+#else
+allValues external
 #endif
 
 --- Returns some value for an expression (currently, via an incomplete
@@ -78,10 +77,10 @@ allValues e = ST.allValuesDFS (ST.someSearchTree e)
 --- Thus, this operation should be used only if the expression
 --- has a single value.
 someValue :: a -> a
-#ifdef __PAKCS__
-someValue external
-#else
+#ifdef __KICS2__
 someValue = ST.someValueWith ST.dfsStrategy
+#else
+someValue external
 #endif
 
 --- Returns just one value for an expression (currently, via an incomplete
@@ -96,12 +95,12 @@ someValue = ST.someValueWith ST.dfsStrategy
 --- Thus, this operation should be used only if the expression
 --- has a single value.
 oneValue :: a -> Maybe a
-#ifdef __PAKCS__
-oneValue external
-#else
+#ifdef __KICS2__
 oneValue x =
   let vals = ST.allValuesWith ST.dfsStrategy (ST.someSearchTree x)
   in (if null vals then Nothing else Just (head vals))
+#else
+oneValue external
 #endif
 
 --- Returns all values satisfying a predicate, i.e., all arguments such that
@@ -112,7 +111,7 @@ oneValue x =
 ---
 --- Note that this operation is not purely declarative since the ordering
 --- of the computed values depends on the ordering of the program rules.
-allSolutions :: (a->Bool) -> [a]
+allSolutions :: Data a => (a -> Bool) -> [a]
 #ifdef __PAKCS__
 allSolutions p = findall (\x -> p x =:= True)
 #else
@@ -128,7 +127,7 @@ allSolutions p = allValues (let x free in p x &> x)
 --- of the computed values depends on the ordering of the program rules.
 --- Thus, this operation should be used only if the
 --- predicate has a single solution.
-someSolution :: (a->Bool) -> a
+someSolution :: Data a => (a -> Bool) -> a
 #ifdef __PAKCS__
 someSolution p = findfirst (\x -> p x =:= True)
 #else
@@ -139,10 +138,10 @@ someSolution p = someValue (let x free in p x &> x)
 --- Conceptually, the argument is evaluated on a copy, i.e.,
 --- even if the computation does not fail, it has not been evaluated.
 isFail :: a -> Bool
-#ifdef __PAKCS__
-isFail external
-#else
+#ifdef __KICS2__
 isFail x = null (allValues (x `seq` ()))
+#else
+isFail external
 #endif
 
 #ifdef __PAKCS__
