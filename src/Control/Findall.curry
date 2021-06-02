@@ -14,12 +14,11 @@
 --- @version June 2021
 ------------------------------------------------------------------------------
 {-# LANGUAGE CPP #-}
-{-# OPTIONS_CYMAKE -Wno-incomplete-patterns #-}
 
 module Control.Findall
   ( getAllValues, getSomeValue
   , allValues, someValue, oneValue
-  , allSolutions, someSolution
+  , allSolutions, someSolution, oneSolution
   , isFail
 #ifdef __PAKCS__
   , rewriteAll, rewriteSome
@@ -112,7 +111,7 @@ oneValue external
 allSolutions :: Data a => (a -> Bool) -> [a]
 allSolutions p = allValues (invertPred p)
 
---- Returns some values satisfying a predicate, i.e., some argument such that
+--- Returns some value satisfying a predicate, i.e., some argument such that
 --- the predicate applied to the argument can be evaluated to `True`
 --- (currently, via an incomplete depth-first strategy).
 --- If there is no value satisfying the predicate, the computation fails.
@@ -123,6 +122,16 @@ allSolutions p = allValues (invertPred p)
 --- predicate has a single solution.
 someSolution :: Data a => (a -> Bool) -> a
 someSolution p = someValue (invertPred p)
+
+--- Returns just one value satisfying a predicate.
+--- If there is no such value, `Nothing` is returned
+---
+--- Note that this operation is not purely declarative since
+--- the computed value depends on the ordering of the program rules.
+--- Thus, this operation should be used only if the expression
+--- has a single value.
+oneSolution :: Data a => (a -> Bool) -> Maybe a
+oneSolution p = oneValue (invertPred p)
 
 -- Inverts a predicate, i.e., compute all values for which the predicate
 -- succeeds.

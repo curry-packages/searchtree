@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 --- This module contains a collection of functions for
---- obtaining lists of solutions to constraints.
+--- obtaining lists of solutions to constraints or values of expressions.
 --- These operations are useful to encapsulate
 --- non-deterministic operations between I/O actions in
 --- order to connect the worlds of logic and functional programming
@@ -12,6 +12,8 @@
 --- are I/O actions in order to avoid some anomalities
 --- in the old concept.
 ---
+--- @author Michael Hanus
+--- @version June 2021
 ------------------------------------------------------------------------------
 {-# LANGUAGE CPP #-}
 
@@ -23,10 +25,10 @@ module Control.AllSolutions
 #endif
   )  where
 
-#ifdef __PAKCS__
-import Control.Findall
-#elif defined(__KICS2__)
+#ifdef __KICS2__
 import Control.SearchTree
+#else
+import Control.Findall
 #endif
 
 --- Gets all values of an expression (currently, via an incomplete
@@ -34,28 +36,24 @@ import Control.SearchTree
 --- on a copy of the expression, i.e., the evaluation of the expression
 --- does not share any results. Moreover, the evaluation suspends
 --- as long as the expression contains unbound variables.
-getAllValues :: Data a => a -> IO [a]
-#ifdef __PAKCS__
-getAllValues e = return (findall (=:=e))
-#elif defined(__CURRY2GO__)
-getAllValues external
-#elif defined(__KICS2__)
-getAllValues e = getSearchTree e >>= return . allValuesDFS
+getAllValues :: a -> IO [a]
+#ifdef __KICS2__
+getAllValues x = getSearchTree x >>= return . allValuesDFS
+#else
+getAllValues x = return (allValues x)
 #endif
 
 --- Gets one value of an expression (currently, via an incomplete
 --- left-to-right strategy). Returns Nothing if the search space
 --- is finitely failed.
-getOneValue :: Data a => a -> IO (Maybe a)
-#ifdef __PAKCS__
-getOneValue x = getOneSolution (x=:=)
-#elif defined(__CURRY2GO__)
-getOneValue external
-#elif defined(__KICS2__)
+getOneValue :: a -> IO (Maybe a)
+#ifdef __KICS2__
 getOneValue x = do
   st <- getSearchTree x
   let vals = allValuesDFS st
   return (if null vals then Nothing else Just (head vals))
+#else
+getOneValue x = return (oneValue x)
 #endif
 
 --- Gets all solutions to a constraint (currently, via an incomplete
@@ -65,26 +63,22 @@ getOneValue x = do
 --- evaluation suspends if the constraints contain unbound variables.
 --- Similar to Prolog's findall.
 getAllSolutions :: Data a => (a -> Bool) -> IO [a]
-#ifdef __PAKCS__
-getAllSolutions c = return (findall c)
-#else
+#ifdef __KICS2__
 getAllSolutions c = getAllValues (let x free in (x,c x)) >>= return . map fst
+#else
+getAllSolutions c = return (allSolutions c)
 #endif
 
 --- Gets one solution to a constraint (currently, via an incomplete
 --- left-to-right strategy). Returns Nothing if the search space
 --- is finitely failed.
 getOneSolution :: Data a => (a -> Bool) -> IO (Maybe a)
-#ifdef __PAKCS__
-getOneSolution c = prim_getOneSolution c
-
-prim_getOneSolution :: (a -> Bool) -> IO (Maybe a)
-prim_getOneSolution external
-
-#else
+#ifdef __KICS2__
 getOneSolution c = do
   sols <- getAllSolutions c
   return (if null sols then Nothing else Just (head sols))
+#else
+getOneSolution c = return (oneSolution c)
 #endif
 
 --- Returns a list of values that do not satisfy a given constraint.
@@ -124,10 +118,11 @@ getSearchTree cs goal = return (getSearchTreeUnsafe cs goal)
 
 getSearchTreeUnsafe :: (Data a, Data b) =>
                        [a] -> (b -> Bool) -> (SearchTree b a)
-getSearchTreeUnsafe [] goal = Solutions (findall goal)
-getSearchTreeUnsafe (c:cs) goal  =
-  SearchBranch (findall (=:= (solve c cs goal)))
+getSearchTreeUnsafe []     goal = Solutions (allSolutions goal)
+getSearchTreeUnsafe (c:cs) goal =
+  SearchBranch (allValues (solve c cs goal))
 
 solve :: (Data a, Data b) => a -> [a] -> (b -> Bool) -> (a, SearchTree b a)
 solve c cs goal | c=:=y = (y, getSearchTreeUnsafe cs goal) where y free
+
 #endif
