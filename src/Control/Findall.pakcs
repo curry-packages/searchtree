@@ -10,17 +10,8 @@
  <primitive name="oneValue" arity="1">
   <entry>prim_oneValue[raw]</entry>
  </primitive>
- <primitive name="findall" arity="1">
-  <entry>prim_findall[raw]</entry>
- </primitive>
- <primitive name="findfirst" arity="1">
-  <entry>prim_findfirst[raw]</entry>
- </primitive>
  <primitive name="isFail" arity="1">
   <entry>prim_isFail[raw]</entry>
- </primitive>
- <primitive name="try" arity="1">
-  <entry>prim_try[raw]</entry>
  </primitive>
  <primitive name="rewriteAll" arity="1">
   <entry>prim_rewriteAll[raw]</entry>

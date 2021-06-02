@@ -11,7 +11,7 @@
 --- in order to support a more portable standard prelude.
 ---
 --- @author Michael Hanus
---- @version December 2018
+--- @version June 2021
 ------------------------------------------------------------------------------
 {-# LANGUAGE CPP #-}
 {-# OPTIONS_CYMAKE -Wno-incomplete-patterns #-}
@@ -22,8 +22,6 @@ module Control.Findall
   , allSolutions, someSolution
   , isFail
 #ifdef __PAKCS__
-  , try, inject, solveAll, once, best
-  , findall, findfirst, browse, browseList, unpack
   , rewriteAll, rewriteSome
 #endif
   ) where
@@ -112,11 +110,7 @@ oneValue external
 --- Note that this operation is not purely declarative since the ordering
 --- of the computed values depends on the ordering of the program rules.
 allSolutions :: Data a => (a -> Bool) -> [a]
-#ifdef __PAKCS__
-allSolutions p = findall (\x -> p x =:= True)
-#else
-allSolutions p = allValues (let x free in p x &> x)
-#endif
+allSolutions p = allValues (invertPred p)
 
 --- Returns some values satisfying a predicate, i.e., some argument such that
 --- the predicate applied to the argument can be evaluated to `True`
@@ -128,11 +122,12 @@ allSolutions p = allValues (let x free in p x &> x)
 --- Thus, this operation should be used only if the
 --- predicate has a single solution.
 someSolution :: Data a => (a -> Bool) -> a
-#ifdef __PAKCS__
-someSolution p = findfirst (\x -> p x =:= True)
-#else
-someSolution p = someValue (let x free in p x &> x)
-#endif
+someSolution p = someValue (invertPred p)
+
+-- Inverts a predicate, i.e., compute all values for which the predicate
+-- succeeds.
+invertPred :: Data a => (a -> Bool) -> a
+invertPred p | p x = x where x free
 
 --- Does the computation of the argument to a head-normal form fail?
 --- Conceptually, the argument is evaluated on a copy, i.e.,
@@ -146,111 +141,8 @@ isFail external
 
 #ifdef __PAKCS__
 ------------------------------------------------------------------------------
---- Basic search control operator.
-try     :: (a -> Bool) -> [a -> Bool]
-try external
-
---- Inject operator which adds the application of the unary
---- procedure p to the search variable to the search goal
---- taken from Oz. p x comes before g x to enable a test+generate
---- form in a sequential implementation.
-inject  :: (a -> Bool) -> (a -> Bool) -> (a -> Bool)
-inject g p = \x -> p x & g x
-
---- Computes all solutions via a a depth-first strategy.
---
--- Works as the following algorithm:
---
--- solveAll g = evalResult (try g)
---         where
---           evalResult []      = []
---           evalResult [s]     = [s]
---           evalResult (a:b:c) = concatMap solveAll (a:b:c)
---
--- The following solveAll algorithm is faster.
--- For comparison we have solveAll2, which implements the above algorithm.
-
-solveAll     :: (a -> Bool) -> [a -> Bool]
-solveAll g = evalall (try g)
-  where
-    evalall []      = []
-    evalall [a]     = [a]
-    evalall (a:b:c) = evalall3 (try a) (b:c)
-
-    evalall2 []    = []
-    evalall2 (a:b) = evalall3 (try a) b
-
-    evalall3 []      b  = evalall2 b
-    evalall3 [l]     b  = l : evalall2 b
-    evalall3 (c:d:e) b  = evalall3 (try c) (d:e ++b)
-
-
-solveAll2  :: (a -> Bool) -> [a -> Bool]
-solveAll2 g = evalResult (try g)
-        where
-          evalResult []      = []
-          evalResult [s]     = [s]
-          evalResult (a:b:c) = concatMap solveAll2 (a:b:c)
-
-
---- Gets the first solution via a depth-first strategy.
-once :: (a -> Bool) -> (a -> Bool)
-once g = head (solveAll g)
-
-
---- Gets the best solution via a depth-first strategy according to
---- a specified operator that can always take a decision which
---- of two solutions is better.
---- In general, the comparison operation should be rigid in its arguments!
-best :: Data a => (a -> Bool) -> (a -> a -> Bool) -> [a -> Bool]
-best g cmp = bestHelp [] (try g) []
- where
-   bestHelp [] []     curbest = curbest
-   bestHelp [] (y:ys) curbest = evalY (try (constrain y curbest)) ys curbest
-   bestHelp (x:xs) ys curbest = evalX (try x) xs ys curbest
-
-   evalY []        ys curbest = bestHelp [] ys curbest
-   evalY [newbest] ys _       = bestHelp [] ys [newbest]
-   evalY (c:d:xs)  ys curbest = bestHelp (c:d:xs) ys curbest
-
-   evalX []        xs ys curbest = bestHelp xs ys curbest
-   evalX [newbest] xs ys _       = bestHelp [] (xs++ys) [newbest]
-   evalX (c:d:e)   xs ys curbest = bestHelp ((c:d:e)++xs) ys curbest
-
-   constrain y []        = y
-   constrain y [curbest] =
-      inject y (\v -> let w free in curbest w & cmp v w  =:= True)
-
-
---- Gets all solutions via a depth-first strategy and unpack
---- the values from the lambda-abstractions.
---- Similar to Prolog's findall.
-findall :: (a -> Bool) -> [a]
-findall external
-
-
---- Gets the first solution via a depth-first strategy
---- and unpack the values from the search goals.
-findfirst :: (a -> Bool) -> a
-findfirst external
-
---- Shows the solution of a solved constraint.
-browse  :: (Data a, Show a) => (a -> Bool) -> IO ()
-browse g = putStr (show (unpack g))
-
---- Unpacks solutions from a list of lambda abstractions and write
---- them to the screen.
-browseList :: (Data a, Show a) => [a -> Bool] -> IO ()
-browseList []     = return ()
-browseList (g:gs) = browse g >> putChar '\n' >> browseList gs
-
-
---- Unpacks a solution's value from a (solved) search goal.
-unpack  :: Data a => (a -> Bool) -> a
-unpack g | g x = x where x free
-
 --- Gets all values computable by term rewriting.
---- In contrast to `findall`, this operation does not wait
+--- In contrast to `allValues`, this operation does not wait
 --- until all "outside" variables are bound to values,
 --- but it returns all values computable by term rewriting
 --- and ignores all computations that requires bindings for outside variables.
