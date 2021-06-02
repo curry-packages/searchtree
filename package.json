@@ -4,6 +4,8 @@
     "author": "Michael Hanus <mh@informatik.uni-kiel.de>",
     "synopsis": "Libraries with operations to strongly encapsulated non-deterministic computations as a search tree or list",
     "category": [ "Logic", "Programming" ],
+    "license": "BSD-3-Clause",
+    "licenseFile": "LICENSE",
     "dependencies": {
         "base"         : ">= 3.0.0, < 4.0.0",
         "random"       : ">= 3.0.0, < 4.0.0"
@@ -17,8 +19,10 @@
                          "Control.SearchTree.Traversal",
                          "Control.AllSolutions", "Control.Findall",
                          "Control.ValueSequence" ],
-    "license": "BSD-3-Clause",
-    "licenseFile": "LICENSE",
+    "testsuite": {
+        "src-dir": "test",
+        "modules": [ "TestAllSolutions" ]
+    },
     "source": {
         "git": "https://git.ps.informatik.uni-kiel.de/curry-packages/searchtree.git",
         "tag": "$version"
