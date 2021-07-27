@@ -3,15 +3,11 @@
 --- Note that some of these operations are not fully declarative,
 --- i.e., the results depend on the order of evaluation and program rules.
 --- There are newer and better approaches the encapsulate search,
---- in particular, set functions (see module `SetFunctions`),
---- which should be used.
----
---- In previous versions of PAKCS, some of these operations were part of
---- the standard prelude. We keep them in this separate module
---- in order to support a more portable standard prelude.
+--- in particular, set functions (see module `Control.SetFunctions` in
+--- package `setfunctions`), which should be used.
 ---
 --- @author Michael Hanus
---- @version June 2021
+--- @version July 2021
 ------------------------------------------------------------------------------
 {-# LANGUAGE CPP #-}
 
@@ -33,7 +29,8 @@ import qualified Control.SearchTree as ST
 --- depth-first strategy). Conceptually, all values are computed
 --- on a copy of the expression, i.e., the evaluation of the expression
 --- does not share any results. In PAKCS, the evaluation suspends
---- as long as the expression contains unbound variables.
+--- as long as the expression contains unbound variables or the computed
+--- values contain unbound variables.
 --- Similar to Prolog's findall.
 getAllValues :: a -> IO [a]
 getAllValues e = return (allValues e)
@@ -43,7 +40,8 @@ getAllValues e = return (allValues e)
 --- the computation fails. Conceptually, the value is computed on a copy
 --- of the expression, i.e., the evaluation of the expression does not share
 --- any results. In PAKCS, the evaluation suspends as long as the expression
---- contains unbound variables.
+--- contains unbound variables or the computed
+--- value contains unbound variables.
 getSomeValue :: a -> IO a
 getSomeValue e = return (someValue e)
 
@@ -51,7 +49,8 @@ getSomeValue e = return (someValue e)
 --- depth-first strategy). Conceptually, all values are computed on a copy
 --- of the expression, i.e., the evaluation of the expression does not share
 --- any results. In PAKCS, the evaluation suspends as long as the expression
---- contains unbound variables.
+--- contains unbound variables or the computed
+--- values contain unbound variables.
 ---
 --- Note that this operation is not purely declarative since the ordering
 --- of the computed values depends on the ordering of the program rules.
@@ -67,7 +66,8 @@ allValues external
 --- computation fails. Conceptually, the value is computed on a copy
 --- of the expression, i.e., the evaluation of the expression does not share
 --- any results. In PAKCS, the evaluation suspends as long as the expression
---- contains unbound variables.
+--- contains unbound variables or the computed
+--- value contains unbound variables.
 ---
 --- Note that this operation is not purely declarative since
 --- the computed value depends on the ordering of the program rules.
@@ -85,7 +85,8 @@ someValue external
 --- is returned. Conceptually, the value is computed on a copy
 --- of the expression, i.e., the evaluation of the expression does not share
 --- any results. In PAKCS, the evaluation suspends as long as the expression
---- contains unbound variables.
+--- contains unbound variables or the computed
+--- value contains unbound variables.
 ---
 --- Note that this operation is not purely declarative since
 --- the computed value depends on the ordering of the program rules.
@@ -104,7 +105,8 @@ oneValue external
 --- the predicate applied to the argument can be evaluated to `True`
 --- (currently, via an incomplete depth-first strategy).
 --- In PAKCS, the evaluation suspends as long as the predicate expression
---- contains unbound variables.
+--- contains unbound variables or the computed
+--- values contain unbound variables.
 ---
 --- Note that this operation is not purely declarative since the ordering
 --- of the computed values depends on the ordering of the program rules.
@@ -154,7 +156,7 @@ isFail external
 --- In contrast to `allValues`, this operation does not wait
 --- until all "outside" variables are bound to values,
 --- but it returns all values computable by term rewriting
---- and ignores all computations that requires bindings for outside variables.
+--- and ignores all computations that require bindings for outside variables.
 rewriteAll :: a -> [a]
 rewriteAll external
 

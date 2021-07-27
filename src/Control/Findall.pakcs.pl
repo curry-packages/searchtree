@@ -3,7 +3,8 @@
 %
 % Warning: in contrast to Curry's definition, this implementation
 % suspends until the expression does not contain unbound global variables.
-% Moreover, it is strict, i.e., it evaluates always all solutions!
+% Moreover, it is strict, i.e., it computes always all solutions even if
+% only a few are actually demanded!
 
 :- block prim_allValues(?,?,-,?).
 prim_allValues(Exp,Vals,E0,E) :-
@@ -13,12 +14,17 @@ prim_allValues(Exp,Vals,E0,E) :-
 :- block prim_allValues_exec(?,?,-,?).
 prim_allValues_exec(Exp,Vals,E0,E) :-
 	hasPrintedFailure
-	 -> findall((X,E1),nf(Exp,X,E0,E1),ValEs),
+	 -> findall((X,E1),evalGNF(Exp,X,E0,E1),ValEs),
 	    extractSolutions(ValEs,Vals,E0,E)
 	  ; asserta(hasPrintedFailure),
-	    findall((X,E1),nf(Exp,X,E0,E1),ValEs),
+	    findall((X,E1),evalGNF(Exp,X,E0,E1),ValEs),
 	    retract(hasPrintedFailure),
 	    extractSolutions(ValEs,Vals,E0,E).
+
+% evaluate a given expression to a ground normal form,
+% i.e., suspend if the normal form contains free variables.
+:- block evalGNF(?,?,-,?).
+evalGNF(Exp,R,E0,E1) :- nf(Exp,R,E0,E2), waitUntilGround(R,E2,E1).
 
 % since the above implementation of allValues is strict,
 % we offer also someValue and oneValue which only evaluates a single value:
@@ -55,8 +61,11 @@ prim_oneValue_exec(Exp,Val,E0,E) :-
 	    extractSolutions(ValEs,Vals,E0,E1),
             (Vals=[X] -> Val='Prelude.Just'(X) ; Val='Prelude.Nothing'), E=E1.
 
+% evaluate a given expression to a single ground normal form,
+% i.e., suspend if the normal form contains free variables and ignore
+% further values.
 :- block oneNF(?,?,-,?).
-oneNF(Exp,R,E0,E1) :- nf(Exp,R,E0,E1), !.
+oneNF(Exp,R,E0,E1) :- evalGNF(Exp,R,E0,E1), !.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
