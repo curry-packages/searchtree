@@ -26,8 +26,8 @@ testGetOneValue = getOneValue (coin+coin) `returns` Just 0
 queens :: Int -> IO [[Int]]
 queens n = getAllFailures (permute [1..n]) capture
  where
-  capture y = let l1,l2,l3,y1,y2 free in
-    l1 ++ [y1] ++ l2 ++ [y2] ++ l3 =:= y & abs (y1-y2) =:= length l2 + 1
+  capture y = let xs,y1,y2 free in
+    _ ++ [y1] ++ xs ++ [y2] ++ _ =:= y & abs (y1-y2) =:= length xs + 1
 
   permute []     = []
   permute (x:xs) = ndinsert (permute xs)
