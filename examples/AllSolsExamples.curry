@@ -9,14 +9,17 @@ coin = 0
 coin = 1
 
 -- Principal use of getAllSolutions:
+all1 :: IO ()
 all1 = getAllSolutions (=:=(coin+coin)) >>= print
 
 -- This example shows that no sharing is performed across encapsulated search:
+all2 :: IO ()
 all2 = let cc = coin+coin in 
   getAllSolutions (=:=cc) >>= print >>
   getAllSolutions (=:=cc) >>= print
 
 -- Example for getOneValue:
+first1 :: IO ()
 first1 = getOneValue (coin+coin) >>= print
 
 

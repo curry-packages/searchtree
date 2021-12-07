@@ -1,8 +1,13 @@
 -- Some examples for search trees of the module Control.AllSolutions
+-- (only valid with PAKCS)
 {-# OPTIONS_FRONTEND -Wno-overlapping #-}
 
 import Control.AllSolutions
 
+-- The famous non-deterministic function:
+coin :: Int
+coin = 0
+coin = 1
 
 -- Generate search tree of depth 0 (similar to getAllSolutions):
 tree0 :: IO (SearchTree Int Int)
