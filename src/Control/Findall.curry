@@ -7,12 +7,12 @@
 --- package `setfunctions`), which should be used.
 ---
 --- @author Michael Hanus
---- @version July 2021
+--- @version November 2022
 ------------------------------------------------------------------------------
 {-# LANGUAGE CPP #-}
 
 module Control.Findall
-  ( getAllValues, getSomeValue
+  ( getAllValues
   , allValues, someValue, oneValue
   , allSolutions, someSolution, oneSolution
   , isFail
@@ -34,16 +34,6 @@ import qualified Control.SearchTree as ST
 --- Similar to Prolog's findall.
 getAllValues :: a -> IO [a]
 getAllValues e = return (allValues e)
-
---- Gets a value of an expression (currently, via an incomplete
---- depth-first strategy). The expression must have a value, otherwise
---- the computation fails. Conceptually, the value is computed on a copy
---- of the expression, i.e., the evaluation of the expression does not share
---- any results. In PAKCS, the evaluation suspends as long as the expression
---- contains unbound variables or the computed
---- value contains unbound variables.
-getSomeValue :: a -> IO a
-getSomeValue e = return (someValue e)
 
 --- Returns all values of an expression (currently, via an incomplete
 --- depth-first strategy). Conceptually, all values are computed on a copy
