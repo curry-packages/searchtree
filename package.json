@@ -24,7 +24,7 @@
         "modules": [ "TestAllSolutions" ]
     },
     "source": {
-        "git": "https://git.ps.informatik.uni-kiel.de/curry-packages/searchtree.git",
+        "git": "https://github.com/curry-packages/searchtree.git",
         "tag": "$version"
     }
 }
