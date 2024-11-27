@@ -3,7 +3,7 @@
     "version": "3.0.0",
     "author": "Michael Hanus <mh@informatik.uni-kiel.de>",
     "synopsis": "Libraries with operations to strongly encapsulated non-deterministic computations as a search tree or list",
-    "category": [ "Logic", "Programming" ],
+    "category": [ "Logic", "Programming", "Control" ],
     "license": "BSD-3-Clause",
     "licenseFile": "LICENSE",
     "dependencies": {
