@@ -6,8 +6,8 @@ to encapsulate non-deterministic computations in data structures,
 e.g., lists or trees. Furthermore, various search strategies on
 search tree structures are defined.
 
-The library implements **strong encapsulation** as discussed in
-[this paper](http://www.informatik.uni-kiel.de/~mh/papers/JFLP04_findall.html).
+The library implements **strong encapsulation** as discussed in the
+[JFLP'04 paper](http://danae.uni-muenster.de/lehre/kuchen/JFLP/articles/2004/S04-01/A2004-06/JFLP-A2004-06.pdf).
 
 Note that the functionality of this package is largely contained
 in the modules `Control.Search/...` of the
